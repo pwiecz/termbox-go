@@ -799,14 +799,19 @@ func input_event_producer() {
 					continue
 				}
 				last_state = cur_state
-				fallthrough
-			case 2:
-				input_comm <- Event{
-					Type:   EventMouse,
-					Key:    last_button,
-					MouseX: int(mr.mouse_pos.x),
-					MouseY: int(mr.mouse_pos.y),
+			case 1:
+				if input_mode&InputMouseMove == 0 {
+					continue
 				}
+			case 2:
+			default:
+				continue
+			}
+			input_comm <- Event{
+				Type:   EventMouse,
+				Key:    last_button,
+				MouseX: int(mr.mouse_pos.x),
+				MouseY: int(mr.mouse_pos.y),
 			}
 		}
 	}
