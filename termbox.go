@@ -28,6 +28,8 @@ const (
 	t_exit_keypad
 	t_enter_mouse
 	t_exit_mouse
+	t_enter_mouse_move
+	t_exit_mouse_move
 	t_max_funcs
 )
 

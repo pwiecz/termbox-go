@@ -159,6 +159,7 @@ const (
 	InputEsc InputMode = 1 << iota
 	InputAlt
 	InputMouse
+	InputMouseMove
 	InputCurrent InputMode = 0
 )
 
