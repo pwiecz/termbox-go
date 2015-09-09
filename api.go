@@ -126,6 +126,7 @@ func Close() {
 	out.WriteString(funcs[t_exit_ca])
 	out.WriteString(funcs[t_exit_keypad])
 	out.WriteString(funcs[t_exit_mouse])
+	out.WriteString(funcs[t_exit_mouse_move])
 	tcsetattr(out.Fd(), &orig_tios)
 
 	out.Close()

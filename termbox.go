@@ -295,7 +295,6 @@ func parse_escape_sequence(event *Event, buf []byte) (int, bool) {
 		case 2:
 			event.Key = MouseRight
 		case 3:
-			return 6, false
 		}
 		event.Type = EventMouse // KeyEvent by default
 		// wheel up outputs MouseLeft
