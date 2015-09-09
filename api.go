@@ -386,15 +386,17 @@ func SetInputMode(mode InputMode) InputMode {
 	if mode&(InputEsc|InputAlt) == InputEsc|InputAlt {
 		mode &^= InputAlt
 	}
+
+	if mode&InputMouseMove == 0 {
+		out.WriteString(funcs[t_exit_mouse_move])
+	}
+	if mode&InputMouse == 0 {
+		out.WriteString(funcs[t_exit_mouse])
+	} else {
+		out.WriteString(funcs[t_enter_mouse])
+	}
 	if mode&InputMouseMove != 0 {
 		out.WriteString(funcs[t_enter_mouse_move])
-	} else {
-		out.WriteString(funcs[t_exit_mouse_move])
-		if mode&InputMouse != 0 {
-			out.WriteString(funcs[t_enter_mouse])
-		} else {
-			out.WriteString(funcs[t_exit_mouse])
-		}
 	}
 
 	input_mode = mode
