@@ -56,7 +56,7 @@ func Init() error {
 	}
 
 	show_cursor(false)
-	term_size = get_term_size(out)
+	term_size = get_win_size(out)
 	back_buffer.init(int(term_size.x), int(term_size.y))
 	front_buffer.init(int(term_size.x), int(term_size.y))
 	back_buffer.clear()

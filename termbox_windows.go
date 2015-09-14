@@ -409,9 +409,10 @@ func get_win_size(out syscall.Handle) coord {
 }
 
 func update_size_maybe() {
-	size := get_term_size(out)
+	size := get_win_size(out)
 	if size.x != term_size.x || size.y != term_size.y {
 		term_size = size
+		set_console_screen_buffer_size(out, size)
 		back_buffer.resize(int(size.x), int(size.y))
 		front_buffer.resize(int(size.x), int(size.y))
 		front_buffer.clear()
@@ -774,11 +775,11 @@ func input_event_producer() {
 				}
 			}
 		case window_buffer_size_event:
-			sr := *(*window_buffer_size_record)(unsafe.Pointer(&r.event))
+			win_size := get_win_size(out)
 			input_comm <- Event{
 				Type:   EventResize,
-				Width:  int(sr.size.x),
-				Height: int(sr.size.y),
+				Width:  int(win_size.x),
+				Height: int(win_size.y),
 			}
 		case mouse_event:
 			mr := *(*mouse_event_record)(unsafe.Pointer(&r.event))
