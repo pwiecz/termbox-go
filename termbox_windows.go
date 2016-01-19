@@ -745,7 +745,9 @@ func input_event_producer() {
 	var r input_record
 	var err error
 	var last_button Key
+	var last_button_pressed Key
 	var last_state = dword(0)
+	var last_x, last_y = -1, -1
 	handles := []syscall.Handle{in, interrupt}
 	for {
 		err = wait_for_multiple_objects(handles)
@@ -783,36 +785,74 @@ func input_event_producer() {
 			}
 		case mouse_event:
 			mr := *(*mouse_event_record)(unsafe.Pointer(&r.event))
-
-			// single or double click
+			ev := Event{Type: EventMouse}
 			switch mr.event_flags {
-			case 0:
+			case 0, 2:
+				// single or double click
 				cur_state := mr.button_state
 				switch {
 				case last_state&mouse_lmb == 0 && cur_state&mouse_lmb != 0:
 					last_button = MouseLeft
+					last_button_pressed = last_button
 				case last_state&mouse_rmb == 0 && cur_state&mouse_rmb != 0:
 					last_button = MouseRight
+					last_button_pressed = last_button
 				case last_state&mouse_mmb == 0 && cur_state&mouse_mmb != 0:
 					last_button = MouseMiddle
+					last_button_pressed = last_button
+				case last_state&mouse_lmb != 0 && cur_state&mouse_lmb == 0:
+					last_button = MouseRelease
+				case last_state&mouse_rmb != 0 && cur_state&mouse_rmb == 0:
+					last_button = MouseRelease
+				case last_state&mouse_mmb != 0 && cur_state&mouse_mmb == 0:
+					last_button = MouseRelease
 				default:
 					last_state = cur_state
 					continue
 				}
 				last_state = cur_state
+				/*
+					case 1:
+						if input_mode&InputMouseMove == 0 {
+							continue
+						}
+					case 2:
+					default:
+						continue
+					}
+				*/
+				ev.Key = last_button
+				last_x, last_y = int(mr.mouse_pos.x), int(mr.mouse_pos.y)
+				ev.MouseX = last_x
+				ev.MouseY = last_y
 			case 1:
-				if input_mode&InputMouseMove == 0 {
-					continue
+				// mouse motion
+				x, y := int(mr.mouse_pos.x), int(mr.mouse_pos.y)
+				if /*last_state != 0 && (*/ last_x != x || last_y != y {
+					ev.Key = last_button_pressed
+					ev.Mod = ModMotion
+					ev.MouseX = x
+					ev.MouseY = y
+					last_x, last_y = x, y
+				} else {
+					ev.Type = EventNone
 				}
-			case 2:
+			case 4:
+				// mouse wheel
+				n := int16(mr.button_state >> 16)
+				if n > 0 {
+					ev.Key = MouseWheelUp
+				} else {
+					ev.Key = MouseWheelDown
+				}
+				last_x, last_y = int(mr.mouse_pos.x), int(mr.mouse_pos.y)
+				ev.MouseX = last_x
+				ev.MouseY = last_y
 			default:
-				continue
+				ev.Type = EventNone
 			}
-			input_comm <- Event{
-				Type:   EventMouse,
-				Key:    last_button,
-				MouseX: int(mr.mouse_pos.x),
-				MouseY: int(mr.mouse_pos.y),
+			if ev.Type != EventNone {
+				input_comm <- ev
 			}
 		}
 	}
