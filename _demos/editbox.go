@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/mattn/go-runewidth"
-	"github.com/nsf/termbox-go"
+	"github.com/pwiecz/termbox-go"
 	"unicode/utf8"
 )
 
