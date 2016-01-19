@@ -2,7 +2,7 @@
 
 package termbox
 
-import "github.com/mattn/go-runewidth"
+//import "github.com/mattn/go-runewidth"
 import "fmt"
 import "os"
 import "os/signal"
@@ -166,10 +166,11 @@ func Flush() error {
 			if back.Ch < ' ' {
 				back.Ch = ' '
 			}
-			w := runewidth.RuneWidth(back.Ch)
-			if w == 0 || w == 2 && runewidth.IsAmbiguousWidth(back.Ch) {
-				w = 1
-			}
+			//			w := runewidth.RuneWidth(back.Ch)
+			//			if w == 0 || w == 2 && runewidth.IsAmbiguousWidth(back.Ch) {
+			//				w = 1
+			//			}
+			w := 1
 			if *back == *front {
 				x += w
 				continue
@@ -397,6 +398,7 @@ func SetInputMode(mode InputMode) InputMode {
 		out.WriteString(funcs[t_enter_mouse])
 	}
 	if mode&InputMouseMove != 0 {
+		out.WriteString(funcs[t_enter_mouse])
 		out.WriteString(funcs[t_enter_mouse_move])
 	}
 
@@ -445,7 +447,10 @@ func SetOutputMode(mode OutputMode) OutputMode {
 	if mode == OutputCurrent {
 		return output_mode
 	}
-
+	term := os.Getenv("TERM")
+	if term == "" || term == "linux" || term == "ansi" {
+		mode = OutputNormal
+	}
 	output_mode = mode
 	return output_mode
 }

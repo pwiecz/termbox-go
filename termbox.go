@@ -71,7 +71,7 @@ var (
 	sigwinch       = make(chan os.Signal, 1)
 	sigio          = make(chan os.Signal, 1)
 	quit           = make(chan int)
-	input_comm     = make(chan input_event)
+	input_comm     = make(chan input_event, 1000)
 	interrupt_comm = make(chan struct{})
 	intbuf         = make([]byte, 0, 16)
 )
@@ -341,7 +341,6 @@ func extract_event(inbuf []byte, event *Event) bool {
 		event.N = 0
 		return false
 	}
-
 	if inbuf[0] == '\033' {
 		// possible escape sequence
 		n, ok := parse_escape_sequence(event, inbuf)
