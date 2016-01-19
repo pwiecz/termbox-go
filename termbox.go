@@ -71,7 +71,7 @@ var (
 	sigwinch       = make(chan os.Signal, 1)
 	sigio          = make(chan os.Signal, 1)
 	quit           = make(chan int)
-	input_comm     = make(chan input_event, 1000)
+	input_comm     = make(chan input_event)
 	interrupt_comm = make(chan struct{})
 	intbuf         = make([]byte, 0, 16)
 
@@ -312,7 +312,9 @@ func parse_mouse_event(event *Event, buf string) (int, bool) {
 		case 3:
 			event.Key = MouseRelease
 		default:
-			return 6, false
+			if input_mode&InputMouseMove == 0 {
+				return 6, false
+			}
 		}
 		event.Type = EventMouse // KeyEvent by default
 		if b&32 != 0 {
@@ -392,7 +394,9 @@ func parse_mouse_event(event *Event, buf string) (int, bool) {
 		case 3:
 			event.Key = MouseRelease
 		default:
-			return mi + 1, false
+			if input_mode&InputMouseMove == 0 {
+				return mi + 1, false
+			}
 		}
 		if !isM {
 			// on xterm mouse release is signaled by lowercase m

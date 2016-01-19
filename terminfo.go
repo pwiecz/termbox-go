@@ -21,10 +21,12 @@ import (
 )
 
 const (
-	ti_magic         = 0432
-	ti_header_length = 12
-	ti_mouse_enter   = "\x1b[?1000h\x1b[?1002h\x1b[?1015h\x1b[?1006h"
-	ti_mouse_leave   = "\x1b[?1006l\x1b[?1015l\x1b[?1002l\x1b[?1000l"
+	ti_magic            = 0432
+	ti_header_length    = 12
+	ti_mouse_enter      = "\x1b[?1000h\x1b[?1002h\x1b[?1015h\x1b[?1006h"
+	ti_mouse_leave      = "\x1b[?1006l\x1b[?1015l\x1b[?1002l\x1b[?1000l"
+	ti_mouse_move_enter = "\x1b[?1000h\x1b[?1002h\x1b[?1003h\x1b[?1015h\x1b[?1006h"
+	ti_mouse_move_leave = "\x1b[?1006l\x1b[?1015l\x1b[?1003l\x1b[?1002l\x1b[?1000l"
 )
 
 func load_terminfo() ([]byte, error) {
@@ -166,16 +168,18 @@ func setup_term() (err error) {
 		}
 	}
 	funcs = make([]string, t_max_funcs)
-	// the last two entries are reserved for mouse. because the table offset is
+	// the last four entries are reserved for mouse. because the table offset is
 	// not there, the two entries have to fill in manually
-	for i, _ := range funcs[:len(funcs)-2] {
+	for i, _ := range funcs[:len(funcs)-4] {
 		funcs[i], err = ti_read_string(rd, str_offset+2*ti_funcs[i], table_offset)
 		if err != nil {
 			return
 		}
 	}
-	funcs[t_max_funcs-2] = ti_mouse_enter
-	funcs[t_max_funcs-1] = ti_mouse_leave
+	funcs[t_max_funcs-4] = ti_mouse_enter
+	funcs[t_max_funcs-3] = ti_mouse_leave
+	funcs[t_max_funcs-2] = ti_mouse_move_enter
+	funcs[t_max_funcs-1] = ti_mouse_move_leave
 	return nil
 }
 
