@@ -169,7 +169,7 @@ func setup_term() (err error) {
 	}
 	funcs = make([]string, t_max_funcs)
 	// the last four entries are reserved for mouse. because the table offset is
-	// not there, the two entries have to fill in manually
+	// not there, the four entries have to fill in manually
 	for i, _ := range funcs[:len(funcs)-4] {
 		funcs[i], err = ti_read_string(rd, str_offset+2*ti_funcs[i], table_offset)
 		if err != nil {
