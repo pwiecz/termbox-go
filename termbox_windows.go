@@ -802,33 +802,29 @@ func input_event_producer() {
 					last_button_pressed = last_button
 				case last_state&mouse_lmb != 0 && cur_state&mouse_lmb == 0:
 					last_button = MouseRelease
+					last_button_pressed = 0
 				case last_state&mouse_rmb != 0 && cur_state&mouse_rmb == 0:
 					last_button = MouseRelease
+					last_button_pressed = 0
 				case last_state&mouse_mmb != 0 && cur_state&mouse_mmb == 0:
 					last_button = MouseRelease
+					last_button_pressed = 0
 				default:
 					last_state = cur_state
 					continue
 				}
 				last_state = cur_state
-				/*
-					case 1:
-						if input_mode&InputMouseMove == 0 {
-							continue
-						}
-					case 2:
-					default:
-						continue
-					}
-				*/
 				ev.Key = last_button
 				last_x, last_y = int(mr.mouse_pos.x), int(mr.mouse_pos.y)
 				ev.MouseX = last_x
 				ev.MouseY = last_y
 			case 1:
 				// mouse motion
+				if last_state == 0 && input_mode&InputMouseMove == 0 {
+					continue
+				}
 				x, y := int(mr.mouse_pos.x), int(mr.mouse_pos.y)
-				if /*last_state != 0 && (*/ last_x != x || last_y != y {
+				if last_x != x || last_y != y {
 					ev.Key = last_button_pressed
 					ev.Mod = ModMotion
 					ev.MouseX = x
