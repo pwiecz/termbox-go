@@ -25,7 +25,7 @@ func rune_advance_len(r rune, pos int) int {
 	if r == '\t' {
 		return tabstop_length - pos%tabstop_length
 	}
-	return 1
+	return runewidth.RuneWidth(r)
 }
 
 func voffset_coffset(text []byte, boffset int) (voffset, coffset int) {
@@ -117,7 +117,7 @@ func (eb *EditBox) Draw(x, y, w, h int) {
 			if rx >= 0 {
 				termbox.SetCell(x+rx, y, r, coldef, coldef)
 			}
-			lx += 1
+			lx += runewidth.RuneWidth(r)
 		}
 	next:
 		t = t[size:]
